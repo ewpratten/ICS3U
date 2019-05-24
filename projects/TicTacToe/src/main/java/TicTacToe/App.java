@@ -1,18 +1,18 @@
 /**
- * LightsOut 
+ * TicTacToe 
  * By: Evan Pratten
  * 
  * This game contains highly reusable code that can be translated over to other grid-based games.
  * There is also tidy logging of the states of the game
  */
-package LightsOut;
+package TicTacToe;
 
 import hsa2.GraphicsConsole;
 import java.awt.Color;
 import java.awt.Point;
 
 public class App {
-    static int size = 5;
+    static int size = 3;
 
     static GraphicsConsole gc = new GraphicsConsole(600, 600, "Lights Out");
 
@@ -36,19 +36,24 @@ public class App {
 
         System.out.println("[Game] Setup complete. Starting game loop");
 
-        int tries = 0;
+        boolean player = false; // false = x, true = o
 
         // loop
-        while (!gameBoard.isFull()) {
+        while (gameBoard.checkState() == 0) {
             // When mouse clicked, deal with state changes
             if (gc.getMouseClick() >= 1) {
                 int x = gc.getMouseX();
                 int y = gc.getMouseY();
 
                 Point loc = new Point(x, y);
-                gameBoard.addressPoints(loc);
 
-                tries++;
+                // If the space is blank, plot marker, then switch player
+                if (gameBoard.checkPoint(loc)) {
+                    gameBoard.addressPoint(loc, player);
+
+                    player = !player;
+                }
+                
             }
 
             // Display the next frame
@@ -56,11 +61,24 @@ public class App {
             gc.sleep(5);
         }
 
-        // Winner!
-        gc.clear();
-        gc.print("Success in " + tries + " tries!");
-        
-        System.out.println("[Game] The game has been won in "+ tries +" tries");
+        // Game end
+        int game_type = gameBoard.checkState(); // 1 = tie, 2 = x, 3 = o
 
+        gc.clear();
+        gc.setColor(Color.white);
+
+        // Check winner type, and print
+        if (game_type != 1) {
+
+            String player_str = (game_type == 2) ? "X" : "O";
+            gc.print(player_str + " has won the game");
+
+            System.out.println("[Game] " + player_str + " has won the game");
+        } else {
+            gc.print("Game tied!");
+
+            System.out.println("[Game] Game tied");
+        }
+        
     }
 }
